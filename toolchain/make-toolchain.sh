@@ -10,11 +10,12 @@ export LINUX_ARCH=arm64
 export HOST=x86_64-pc-linux-gnu
 export TARGET=aarch64-rpi4-linux-gnu
 
+SCRIPTDIR=$(dirname $(realpath $0))
 
-export PREFIX="$PWD/$TARGET"
+export PREFIX="$SCRIPTDIR/$TARGET"
 
 
-WORKDIR="$PWD/work"
+WORKDIR="$SCRIPTDIR/work"
 
 SYSROOT="$PREFIX/$TARGET/sysroot"
 
@@ -292,11 +293,11 @@ build-glibc-final()
 
 	make -j$(nproc) CXX="" BUILD_CFLAGS="-O2 -g -I$BUILDTOOLS/include" \
 		 BUILD_CPPFLAGS="" BUILD_LDFLAGS="-L$BUILDTOOLS/lib" \
-		 install_root="$SYSROOT" all
+		 install_root="$SYSROOT" all &> /dev/null
 
 	make -j$(nproc) CXX="" BUILD_CFLAGS="-O2 -g -I$BUILDTOOLS/include" \
 		 BUILD_CPPFLAGS="" BUILD_LDFLAGS="-L$BUILDTOOLS/lib" \
-		 install_root="$SYSROOT" install
+		 install_root="$SYSROOT" install &> /dev/null
 
 	popd > /dev/null
 }
@@ -307,30 +308,8 @@ build-gcc-final()
 	mkdir -p $BUILDDIR/build-gcc-$GCCVERSION-final
 	pushd $BUILDDIR/build-gcc-$GCCVERSION-final > /dev/null
 
-	$SOURCEDIR/gcc-$GCCVERSION/configure \
-		CC_FOR_BUILD="/bin/gcc" \
-		CFLAGS="-O2 -g -pipe -I$BUILDTOOLS/include" \
-		CFLAGS_FOR_BUILD="-O2 -g -pipe -I$BUILDTOOLS/include" \
-		CXXFLAGS="-O2 -g -pipe -I$BUILDTOOLS/include" \
-		CXXFLAGS_FOR_BUILD="-O2 -g -pipe -I$BUILDTOOLS/include" \
-		LDFLAGS="-L$BUILDTOOLS/lib -lstdc++ -lm" \
-		CFLAGS_FOR_TARGET="" \
-		CXXFLAGS_FOR_TARGET="" \
-		LDFLAGS_FOR_TARGET="" \
-		--prefix=$PREFIX --with-sysroot=$SYSROOT --with-local-prefix=$SYSROOT \
-		--build=$HOST --host=$HOST --target=$TARGET \
-		--with-arch=$GCC_ARCH --with-cpu=$GCC_CPU \
-		--disable-libgomp --disable-libmudflap --disable-libmpx \
-		--disable-libssp --disable-libsanitizer \
-		--disable-libquadmath --disable-libquadmath-support \
-		--disable-multilib --disable-nls --enable-threads=posix \
-		--with-gmp=$BUILDTOOLS --with-mpfr=$BUILDTOOLS --with-mpc=$BUILDTOOLS \
-		--disable-multilib --disable-lto \
-		--enable-plugin --enable-gold --enable-__cxa_atexit --enable-long-long\
-		--enable-languages=c,c++ &> /dev/null
-
-	make -j$(nproc) all
-	make -j$(nproc) install
+	make -j$(nproc) all &> /dev/null
+	make -j$(nproc) install &> /dev/null
 
 	popd > /dev/null
 }
@@ -386,6 +365,10 @@ build-all()
 #############################################
 #############################################
 
+pushd $SCRIPTDIR > /dev/null
+
 download-all
 extract-all
 build-all
+
+popd > /dev/null
