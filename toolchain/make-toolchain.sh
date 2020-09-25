@@ -376,7 +376,6 @@ build-all()
 	build-binutils
 	build-gcc-pass1
 	build-kernel-headers
-	exit
 	build-glibc-headers
 	build-gcc-pass2
 	build-glibc-final
@@ -387,11 +386,6 @@ build-all()
 #############################################
 #############################################
 
-#download-all
-#extract-all
-#build-all
-
-#build-glibc-headers
-#build-gcc-pass2
-#build-glibc-final
-build-gcc-final
+download-all
+extract-all
+build-all
