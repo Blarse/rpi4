@@ -308,6 +308,28 @@ build-gcc-final()
 	mkdir -p $BUILDDIR/build-gcc-$GCCVERSION-final
 	pushd $BUILDDIR/build-gcc-$GCCVERSION-final > /dev/null
 
+	$SOURCEDIR/gcc-$GCCVERSION/configure \
+		CC_FOR_BUILD="/bin/gcc" \
+		CFLAGS="-O2 -g -pipe -I$BUILDTOOLS/include" \
+		CFLAGS_FOR_BUILD="-O2 -g -pipe -I$BUILDTOOLS/include" \
+		CXXFLAGS="-O2 -g -pipe -I$BUILDTOOLS/include" \
+		CXXFLAGS_FOR_BUILD="-O2 -g -pipe -I$BUILDTOOLS/include" \
+		LDFLAGS="-L$BUILDTOOLS/lib -lstdc++ -lm" \
+		CFLAGS_FOR_TARGET="" \
+		CXXFLAGS_FOR_TARGET="" \
+		LDFLAGS_FOR_TARGET="" \
+		--prefix=$PREFIX --with-sysroot=$SYSROOT --with-local-prefix=$SYSROOT \
+		--build=$HOST --host=$HOST --target=$TARGET \
+		--with-arch=$GCC_ARCH --with-cpu=$GCC_CPU \
+		--disable-libgomp --disable-libmudflap --disable-libmpx \
+		--disable-libssp --disable-libsanitizer \
+		--disable-libquadmath --disable-libquadmath-support \
+		--disable-multilib --disable-nls --enable-threads=posix \
+		--with-gmp=$BUILDTOOLS --with-mpfr=$BUILDTOOLS --with-mpc=$BUILDTOOLS \
+		--disable-multilib --disable-lto \
+		--enable-plugin --enable-gold --enable-__cxa_atexit --enable-long-long\
+		--enable-languages=c,c++ &> /dev/null
+
 	make -j$(nproc) all &> /dev/null
 	make -j$(nproc) install &> /dev/null
 
